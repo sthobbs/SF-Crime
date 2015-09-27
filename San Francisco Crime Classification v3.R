@@ -24,7 +24,7 @@ test <- read.csv("test.csv")
 
 ## Clean the data
 
-# Discretize X and Y (longtude and latitude) based on quantiles.
+# Discretize X and Y (longitude and latitude) based on quantiles.
 # g is the number of breaks
 train<-mutate(train,cutX=cut2(X,g=10,digits=10))
 train<-mutate(train,cutY=cut2(Y,g=10,digits=10))
@@ -43,11 +43,11 @@ test<-mutate(test,year=as.factor(substring(Dates,1,4)))
 test<-mutate(test,hour=as.factor(substring(Dates,12,13)))
 
 
-# remove factors not in both training and test sets (and address and dates)
+# Remove factors not in both training and test sets (and address and dates)
 train <- train[,-c(1,3,6,7)]
 test <- test[,-c(1,2,5)]
 
-# splitting the train set into 'training' and 'testing' subsets
+# Splitting the train set into 'training' and 'testing' subsets
 inTraining <- sample(1:nrow(train), numTrain)
 training <- train[inTraining,]
 training$Category<-as.factor(as.character(training$Category)) # remove empty levels
@@ -64,11 +64,12 @@ proc.time() - ptm
 predictions<-predict(fit2,testing) # predicting testing set
 suppressWarnings(confusionMatrix(predictions,testing_cat)$overall[1])
 
-
 predictions<-predict(fit2,test) # predict test set
 
 
-### 
+
+###===================
+### Neural Networks, possible other fit
 ptm <- proc.time()
 fit3<-train(Category~.,data=training,method="avNNet",linout = TRUE, trace = FALSE)
 proc.time() - ptm
@@ -80,11 +81,14 @@ suppressWarnings(confusionMatrix(pred3,testing$Category)$overall[1])
 # 2000 => 1666  0.2184022
 # 3000 => 2448  0.226689
 
+## possible other fit
 ptm <- proc.time()
 fit4<-train(Category~.,data=training,method="treebag",linout = TRUE, trace = FALSE)
 proc.time() - ptm
 pred4<-predict(fit4,testing)
 suppressWarnings(confusionMatrix(pred4,testing$Category)$overall[1])
+###===================
+
 
 
 # Write file for submission
